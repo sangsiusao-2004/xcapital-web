@@ -1,26 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400&display=swap");
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Amoresa";
+  src: url("/fonts/Amoresa.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TT Ramillas";
+  src: url("/fonts/TTRamillas.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #030303;
+  --foreground: #f5e7b2;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 5% 70%, rgba(255, 214, 100, 0.42), transparent 18%),
+    radial-gradient(circle at 95% 35%, rgba(212, 175, 55, 0.28), transparent 22%),
+    linear-gradient(135deg, #030303, #100d05, #030303);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 215, 90, 0.9) 1px,
+    transparent 2px
+  );
+  background-size: 38px 38px;
+}
+
+.input-gold {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  outline: none;
+  font-size: 16px;
+}
+
+.input-gold::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.input-gold:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#fff1a8, #d4af37, #9b6b10);
+  border-radius: 999px;
 }
