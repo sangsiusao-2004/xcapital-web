@@ -59,6 +59,7 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [typingText, setTypingText] = useState("");
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
   const [accountTab, setAccountTab] = useState(null);
 // profile | settings | plus | help
   const [currentUserName, setCurrentUserName] = useState("bnn");
@@ -296,13 +297,13 @@ export default function Home() {
     try {
 
       const res = await fetch(
-        "https://api.metals.live/v1/spot/gold"
+        "https://api.gold-api.com/price/XAU"
       );
 
       const data = await res.json();
 
       const price =
-        Number(data[0].price);
+        Number(data.price);
 
       let change = 0;
 
@@ -431,14 +432,16 @@ export default function Home() {
       JSON.stringify(messages)
     );
 
-    if (chatContainerRef.current) {
+    setTimeout(() => {
 
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+      if (chatContainerRef.current) {
 
-    }
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+
+      }
+
+    }, 100);
 
   }, [messages]);
 
@@ -827,6 +830,378 @@ export default function Home() {
         </div>
       )}
       {isLoggedIn && (
+        <>
+          {accountMenuOpen && (
+            <div
+              className="
+                fixed
+                inset-0
+                z-[999]
+                bg-black/70
+                lg:hidden
+              "
+              onClick={() =>
+                setAccountMenuOpen(false)
+              }
+            >
+              <div
+                className="
+                  absolute
+                  right-0
+                  top-0
+                  h-full
+                  w-[82%]
+
+                  overflow-y-auto
+                  overflow-hidden
+
+                  border-l
+                  border-yellow-500/20
+
+                  p-5
+
+                  bg-[radial-gradient(circle_at_5%_70%,rgba(255,214,100,0.22),transparent_18%),radial-gradient(circle_at_95%_35%,rgba(212,175,55,0.18),transparent_22%),linear-gradient(135deg,#030303,#100d05,#030303)]
+
+                  shadow-[0_0_60px_rgba(212,175,55,0.08)]
+
+                  backdrop-blur-xl
+                "
+                onClick={(e) =>
+                  e.stopPropagation()
+                }
+              >
+
+                <div
+                  className="
+                  relative
+                  mb-7
+                  px-2
+                  pt-1
+                  pb-2
+                "
+                >
+
+                  {/* CONTENT */}
+
+                  <div className="relative z-10">
+
+                    <h1
+                      className="
+                        leading-none
+                        text-yellow-300
+                      "
+                      style={{
+                        fontFamily: "Amoresa",
+                        fontSize: "46px",
+                        textShadow: `
+                          0 0 10px rgba(255,220,120,0.45),
+                          0 0 30px rgba(212,175,55,0.28)
+                        `,
+                      }}
+                    >
+                      X-Capital
+                    </h1>
+
+                    <p
+                      className="
+                        -mt-1
+                        text-white
+                      "
+                      style={{
+                        fontFamily: "'Dancing Script', cursive",
+                        fontSize: "28px",
+                        textShadow: `
+                          0 0 10px rgba(255,255,255,0.25)
+                        `,
+                      }}
+                    >
+                      Bot Signals
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <div className="space-y-3">
+
+                  <div className="rounded-xl border border-yellow-500/20 bg-black/40 p-4">
+                    <p className="text-sm text-gray-400">
+                      Giá vàng hiện tại
+                    </p>
+
+                    <p className="mt-2 text-3xl font-bold text-yellow-300">
+                      {goldPrice || "----"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-yellow-500/20 bg-black/40 p-4">
+                    <p className="text-sm text-gray-400">
+                      Xu hướng hiện tại
+                    </p>
+
+                    <p className="mt-2 text-3xl font-bold text-yellow-300">
+                      {goldSignal}
+                    </p>
+                  </div>
+
+                  <div
+                    className="
+                      mt-5
+                      rounded-2xl
+                      border
+                      border-yellow-500/20
+                      bg-white/5
+                      overflow-hidden
+                    "
+                  >
+
+                    {/* HEADER */}
+                    <button
+                      onClick={() =>
+                        setMobileProfileOpen(!mobileProfileOpen)
+                      }
+                      className="
+                        flex
+                        w-full
+                        items-center
+                        justify-between
+                        p-4
+                      "
+                    >
+
+                      <div className="flex items-center gap-3">
+
+                        {/* AVATAR */}
+                        <div
+                          className="
+                            flex
+                            h-12
+                            w-12
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-gradient-to-r
+                            from-yellow-200
+                            to-yellow-500
+                            text-black
+                            font-bold
+                          "
+                        >
+                          {currentUserName?.slice(0,2).toUpperCase()}
+                        </div>
+
+                        {/* USER INFO */}
+                        <div className="text-left">
+
+                          <h3 className="font-semibold text-white">
+                            {currentUserName || "User"}
+                          </h3>
+
+                          <p className="text-sm text-gray-400">
+                            {accountType}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      {/* ARROW */}
+                      <span
+                        className={`
+                          text-gray-400
+                          text-2xl
+                          transition-all
+                          duration-300
+
+                          ${
+                            mobileProfileOpen
+                              ? "rotate-90"
+                              : ""
+                          }
+                        `}
+                      >
+                        ›
+                      </span>
+
+                    </button>
+
+                    {/* DROPDOWN */}
+                    <div
+                      className={`
+                        overflow-hidden
+                        transition-all
+                        duration-300
+
+                        ${
+                          mobileProfileOpen
+                            ? "max-h-[500px] opacity-100"
+                            : "max-h-0 opacity-0"
+                        }
+                      `}
+                    >
+
+                      <div className="border-t border-white/10 p-3">
+
+                        <div className="space-y-2">
+
+                          {/* PLUS */}
+                          <button
+                            onClick={() => {
+
+                              setAccountTab("plus");
+
+                              setAccountMenuOpen(false);
+
+                            }}
+                            className="
+                              flex
+                              w-full
+                              items-center
+                              gap-3
+                              rounded-xl
+                              px-4
+                              py-3
+                              text-left
+                              transition
+                              hover:bg-yellow-500/10
+                            "
+                          >
+                            <span>✨</span>
+                            <span>Nâng cấp gói</span>
+                          </button>
+
+                          {/* PROFILE */}
+                          <button
+                            onClick={() => {
+
+                              setAccountTab("profile");
+
+                              setAccountMenuOpen(false);
+
+                            }}
+                            className="
+                              flex
+                              w-full
+                              items-center
+                              gap-3
+                              rounded-xl
+                              px-4
+                              py-3
+                              text-left
+                              transition
+                              hover:bg-yellow-500/10
+                            "
+                          >
+                            <span>👤</span>
+                            <span>Hồ sơ</span>
+                          </button>
+
+                          {/* SETTINGS */}
+                          <button
+                            onClick={() => {
+
+                              setAccountTab("settings");
+
+                              setAccountMenuOpen(false);
+
+                            }}
+                            className="
+                              flex
+                              w-full
+                              items-center
+                              gap-3
+                              rounded-xl
+                              px-4
+                              py-3
+                              text-left
+                              transition
+                              hover:bg-yellow-500/10
+                            "
+                          >
+                            <span>⚙️</span>
+                            <span>Cài đặt</span>
+                          </button>
+
+                          {/* HELP */}
+                          <button
+                            onClick={() => {
+
+                              setAccountTab("help");
+
+                              setAccountMenuOpen(false);
+
+                            }}
+                            className="
+                              flex
+                              w-full
+                              items-center
+                              gap-3
+                              rounded-xl
+                              px-4
+                              py-3
+                              text-left
+                              transition
+                              hover:bg-yellow-500/10
+                            "
+                          >
+                            <span>❔</span>
+                            <span>Trợ giúp</span>
+                          </button>
+
+                        </div>
+
+                        {/* DIVIDER */}
+                        <div className="my-4 h-px bg-white/10" />
+
+                        {/* LOGOUT */}
+                        <button
+                          onClick={() => {
+
+                            localStorage.removeItem(
+                              "xcap_user"
+                            );
+
+                            setIsLoggedIn(false);
+
+                            setEmail("");
+
+                            setPassword("");
+
+                            setMessage("");
+
+                            setAccountMenuOpen(false);
+
+                          }}
+                          className="
+                            flex
+                            w-full
+                            items-center
+                            gap-3
+                            rounded-xl
+                            px-4
+                            py-3
+                            text-left
+                            text-red-300
+                            transition
+                            hover:bg-red-500/10
+                          "
+                        >
+                          <span>↪</span>
+                          <span>Đăng xuất</span>
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+           )}
+        
         <div
           className="
           relative
@@ -885,7 +1260,7 @@ export default function Home() {
               {accountMenuOpen && (
                 <div className="mb-3 rounded-2xl border border-yellow-500/20 bg-[#1b1b1b] p-3 shadow-[0_0_40px_rgba(0,0,0,0.65)]">
                   <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-yellow-200 to-yellow-600 text-sm font-bold text-black">
+                    <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-full bg-gradient-to-r from-yellow-200 to-yellow-600 text-xs lg:text-sm font-bold text-black">
                       {currentUserName?.slice(0, 2).toUpperCase()}
                     </div>
 
@@ -965,7 +1340,7 @@ export default function Home() {
                 className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-black/80 p-3 hover:bg-white/10"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-yellow-200 to-yellow-600 text-sm font-bold text-black">
+                  <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-full bg-gradient-to-r from-yellow-200 to-yellow-600 text-xs lg:text-sm font-bold text-black">
                     {currentUserName?.slice(0, 2).toUpperCase()}
                   </div>
 
@@ -982,40 +1357,61 @@ export default function Home() {
 
           {/* KHUNG CHAT GIỮA */}
           <section className="flex h-full min-h-0 overflow-hidden flex-col border-r border-yellow-500/20 bg-black/35">
-            <header className="shrink-0 flex flex-col gap-4 border-b border-yellow-500/20 bg-black/55 px-4 py-5 backdrop-blur-md lg:flex-row lg:items-center lg:justify-between lg:px-6">
-              <div>
-                <h2 className="text-xl font-bold lg:text-2xl">Chat AI Signals</h2>
-                <p className="text-sm text-gray-400">AI phân tích kỹ thuật XAUUSD realtime</p>
-              </div>
+            <header className="shrink-0 flex flex-col gap-4 border-b border-yellow-500/20 bg-black/55 px-3 py-4 lg:px-6 lg:py-5 backdrop-blur-md lg:flex-row lg:items-center lg:justify-between lg:px-6">
+              <div className="flex items-center justify-between w-full">
 
-              <button
-                onClick={() => {
-                  localStorage.removeItem("xcap_user");
-                  setIsLoggedIn(false);
-                  setEmail("");
-                  setPassword("");
-                  setMessage("");
-                  setChatInput("");
-                }}
-                className="rounded-lg border border-yellow-400/30 px-5 py-2 text-yellow-300 hover:bg-yellow-400/10"
-              >
-                Thoát
-              </button>
+                <div>
+                  <h2 className="text-xl font-bold lg:text-2xl">
+                    Chat AI Signals
+                  </h2>
+
+                  <p className="text-sm text-gray-400">
+                    AI phân tích kỹ thuật XAUUSD realtime
+                  </p>
+                </div>
+
+                {/* MOBILE MENU */}
+                <button
+                  onClick={() =>
+                    setAccountMenuOpen(!accountMenuOpen)
+                  }
+                  className="
+                    flex
+                    lg:hidden
+                    items-center
+                    justify-center
+                    w-11
+                    h-11
+                    rounded-xl
+                    border
+                    border-yellow-500/20
+                    bg-black/50
+                    text-yellow-300
+                    text-2xl
+                  "
+                >
+                  ☰
+                </button>
+
+              </div>
             </header>
 
             <div
               ref={chatContainerRef}
               className="
-              flex-1
-              min-h-0
-              overflow-y-auto
-              overflow-x-hidden
-              px-4
-              py-4
-              lg:px-3
-              lg:py-6
-              custom-scroll
-            "
+                flex-1
+                min-h-0
+                overflow-y-auto
+                overflow-x-hidden
+
+                px-2
+                py-3
+
+                lg:px-3
+                lg:py-6
+
+                custom-scroll
+              "
             >
               <div className="flex w-full flex-col gap-5">
                 {messages.map((msg, index) => (
@@ -1067,7 +1463,7 @@ export default function Home() {
                     {/* CHAT BOX */}
                     <div
                       className={`
-                        w-[50%]
+                        w-[98%] sm:w-[92%] lg:w-[50%]
                         overflow-hidden
                         rounded-3xl
                         border
@@ -1089,8 +1485,10 @@ export default function Home() {
                           justify-between
                           border-b
                           border-yellow-500/10
-                          px-3
-                          py-3
+                          px-2
+                          py-2
+                          lg:px-3
+                          lg:py-3
                         "
                       >
 
@@ -1164,13 +1562,17 @@ export default function Home() {
 
                             <span
                               className="
+                                hidden
+                                sm:block
                                 rounded-full
                                 bg-yellow-500/20
-                                px-3
+                                px-2
                                 py-1
-                                text-xs
+                                text-[10px]
                                 font-bold
                                 text-yellow-300
+                                lg:px-3
+                                lg:text-xs
                               "
                             >
                               AI SIGNAL
@@ -1215,8 +1617,7 @@ export default function Home() {
                           className={`
                             whitespace-pre-wrap
                             font-sans
-                            text-[15px]
-                            leading-8
+                            text-[13px] leading-6 lg:text-[15px] lg:leading-8
                             tracking-wide
                             text-gray-100
                           `}
@@ -1299,17 +1700,21 @@ export default function Home() {
 
             <div
               className="
-              shrink-0
-              border-t
-              border-yellow-500/20
-              bg-black/80
-              backdrop-blur-xl
-              p-5
-              z-40
-              shrink-0
-            "
+                shrink-0
+                border-t
+                border-yellow-500/20
+                bg-black/80
+
+                backdrop-blur-md
+                lg:backdrop-blur-xl
+
+                p-3
+                lg:p-5
+
+                z-40
+              "
             >
-                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+                <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
                 
                 <label
                   className={`flex h-[56px] cursor-pointer items-center justify-center gap-2 rounded-xl border transition ${
@@ -1626,13 +2031,14 @@ export default function Home() {
             </div>
           </aside>
         </div>
+        </>
       )}
 
       {!isLoggedIn && (
-  <div className="relative z-10 min-h-screen">
+      <div className="relative z-10 min-h-screen">
         <div className="
         absolute
-        top-8
+        top-4 lg:top-8
         left-0
         flex
         flex-col
@@ -1644,7 +2050,7 @@ export default function Home() {
         ">
           <button
             onClick={() => setAuthMode("register")}
-            className="bg-gradient-to-r from-[#e9a832] via-[#fff1a8] to-[#f2c75c] text-black px-5 py-4 text-lg lg:px-10 lg:py-7 lg:text-3xl hover:brightness-110 transition"
+            className="bg-gradient-to-r from-[#e9a832] via-[#fff1a8] to-[#f2c75c] text-black px-4 py-3 text-base lg:px-10 lg:py-7 lg:text-3xl hover:brightness-110 transition"
             style={{ fontFamily: "'TT Ramillas', serif", fontWeight: 400 }}
           >
             Đăng Ký
@@ -1652,7 +2058,7 @@ export default function Home() {
 
           <button
             onClick={() => setAuthMode("login")}
-            className="bg-gradient-to-r from-[#fff1a8] via-[#f4d36a] to-[#e9a832] text-black px-5 py-4 text-lg lg:px-10 lg:py-7 lg:text-3xl hover:brightness-110 transition"
+            className="bg-gradient-to-r from-[#fff1a8] via-[#f4d36a] to-[#e9a832] text-black px-4 py-3 text-base lg:px-10 lg:py-7 lg:text-3xl hover:brightness-110 transition"
             style={{ fontFamily: "'TT Ramillas', serif", fontWeight: 400 }}
           >
             Đăng Nhập
@@ -1664,7 +2070,7 @@ export default function Home() {
             className="leading-none text-white"
             style={{
               fontFamily: "Amoresa",
-              fontSize: "clamp(72px, 14vw, 290px)",
+              fontSize: "clamp(54px, 14vw, 290px)",
               fontWeight: 400,
               letterSpacing: "1px",
               textShadow: `
@@ -1679,7 +2085,7 @@ export default function Home() {
           </h1>
 
           <h2
-            className="leading-none text-white -mt-12"
+            className="leading-none text-white -mt-4 lg:-mt-12"
             style={{
               fontFamily: "'Dancing Script', cursive",
               fontSize: "clamp(42px, 7vw, 145px)",
