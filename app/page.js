@@ -81,6 +81,8 @@ export default function Home() {
   const [marketLoading, setMarketLoading] = useState(false);
   const [isFetchingPrice, setIsFetchingPrice] =
     useState(false);
+  const [analyzeCooldown, setAnalyzeCooldown] =
+    useState(0);
   const [signalNotify, setSignalNotify] = useState(true);
   const [newPassword, setNewPassword] = useState("");
   const [settingMessage, setSettingMessage] = useState("");
@@ -88,6 +90,7 @@ export default function Home() {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [sendCooldown, setSendCooldown] = useState(0);
 
   async function handleSendCode() {
     setMessage("");
@@ -118,8 +121,13 @@ export default function Home() {
       }
 
       if (data.success) {
+
         setSentCode(String(data.code).trim());
+
         setMessage("Mã xác thực đã được gửi về email.");
+
+        setSendCooldown(30);
+
       } else {
         setMessage(data.message || "Không gửi được mã.");
       }
@@ -145,6 +153,12 @@ export default function Home() {
   }
 
   async function handleSendMessage() {
+
+  if (analyzeCooldown > 0) {
+
+    return;
+
+  }
 
   if (
     !chartImage ||
@@ -252,6 +266,8 @@ export default function Home() {
           setTypingText("");
 
           setIsAnalyzing(false);
+
+          setAnalyzeCooldown(90);
         }
 
       }, 15);
@@ -304,26 +320,32 @@ export default function Home() {
 
       const price =
         Number(data.price);
+        if (Number.isNaN(price)) return;
 
       let change = 0;
 
-      let direction = "neutral";
+      let direction = "neutral"; 
 
-      if (previousPrice !== null) {
+      if (goldPrice !== null) {
 
-        change =
-          price - previousPrice;
+        change = price - goldPrice;
 
         if (change > 0) {
-          direction = "up";
-        }
 
-        else if (change < 0) {
+          direction = "up";
+
+        } else if (change < 0) {
+
           direction = "down";
+
+        } else {
+
+          direction = "neutral";
+
         }
       }
 
-      setPreviousPrice(price);
+      setPreviousPrice(goldPrice);
 
       setGoldPrice(price);
 
@@ -444,6 +466,35 @@ export default function Home() {
     }, 100);
 
   }, [messages]);
+
+  
+  useEffect(() => {
+
+    if (sendCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+
+      setSendCooldown((prev) => prev - 1);
+
+    }, 1000);
+
+    return () => clearInterval(timer);
+
+  }, [sendCooldown]);
+
+  useEffect(() => {
+
+    if (analyzeCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+
+      setAnalyzeCooldown((prev) => prev - 1);
+
+    }, 1000);
+
+    return () => clearInterval(timer);
+
+  }, [analyzeCooldown]);
 
   useEffect(() => {
 
@@ -1805,11 +1856,12 @@ export default function Home() {
                 <button
                   onClick={handleSendMessage}
                   disabled={
-                    isAnalyzing ||
-                    !chartImage ||
-                    !goldInput ||
-                    !selectedTimeframe
-                  }
+                  isAnalyzing ||
+                  analyzeCooldown > 0 ||
+                  !chartImage ||
+                  !goldInput ||
+                  !selectedTimeframe
+                }
                   className="
                   w-full
                   h-[56px]
@@ -1833,7 +1885,11 @@ export default function Home() {
                   disabled:hover:shadow-none
                   "
                 >
-                  {isAnalyzing ? "Đang phân tích..." : "Gửi phân tích"}
+                  {isAnalyzing
+                    ? "Đang phân tích..."
+                    : analyzeCooldown > 0
+                      ? `Chờ ${analyzeCooldown}s`
+                      : "Gửi phân tích"}
                 </button>
 
               </div>
@@ -1861,13 +1917,14 @@ export default function Home() {
                   font-bold
                   transition-all
                   duration-300
+                  animate-pulse
 
                   ${
                     goldDirection === "up"
-                      ? "text-green-400"
+                      ? "text-green-400 drop-shadow-[0_0_18px_rgba(74,222,128,0.9)]"
 
                     : goldDirection === "down"
-                      ? "text-red-400"
+                      ? "text-red-400 drop-shadow-[0_0_18px_rgba(248,113,113,0.9)]"
 
                     : "text-white"
                   }
@@ -2188,9 +2245,24 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleSendCode}
-                  className="mb-[14px] flex-1 rounded-xl border border-yellow-400/40 text-yellow-300 font-semibold hover:bg-yellow-400/10"
+                  disabled={sendCooldown > 0}
+                  className="
+                    mb-[14px]
+                    flex-1
+                    rounded-xl
+                    border
+                    border-yellow-400/40
+                    text-yellow-300
+                    font-semibold
+                    hover:bg-yellow-400/10
+
+                    disabled:opacity-40
+                    disabled:cursor-not-allowed
+                  "
                 >
-                  Gửi Mã
+                  {sendCooldown > 0
+                    ? `${sendCooldown}s`
+                    : "Gửi Mã"}
                 </button>
               </div>
             )}
@@ -2433,6 +2505,21 @@ export default function Home() {
                   setAccountType("Free");
                   setIsLoggedIn(true);
                   setAuthMode(null);
+
+                  await supabase.from("login_logs").insert([
+                    {
+                      email: user.email,
+
+                      user_id: user.id,
+
+                      login_status: "success",
+
+                      device: navigator.userAgent,
+
+                      created_at: new Date(),
+                    },
+                  ]);
+
                   localStorage.setItem(
                   "xcap_user",
                   JSON.stringify({
