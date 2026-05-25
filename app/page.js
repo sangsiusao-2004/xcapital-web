@@ -2372,7 +2372,25 @@ export default function Home() {
                   ]);
 
                   if (insertError) {
-                    setMessage("Không lưu được tài khoản: " + insertError.message);
+
+                    if (
+                      insertError.message.includes("duplicate") ||
+                      insertError.message.includes("unique")
+                    ) {
+
+                      setMessage(
+                        "Email này đã được đăng ký."
+                      );
+
+                    } else {
+
+                      setMessage(
+                        "Không lưu được tài khoản: " +
+                        insertError.message
+                      );
+
+                    }
+
                     return;
                   }
 
